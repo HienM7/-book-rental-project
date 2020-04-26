@@ -1,0 +1,23 @@
+extends ../layouts/common
+  
+block content
+  h1.pb-5 Create transaction
+
+  .input-group.mb-3
+    .input-group-prepend
+      label.input-group-text(for='inputGroupSelect01') User Name
+    select#inputGroupSelect01.custom-select(name="username", form="transaction")
+      each user in users
+        option(value=user.name)= user.name
+
+  .input-group.mb-3
+    .input-group-prepend
+      label.input-group-text(for='inputGroupSelect01') Book title
+    select#inputGroupSelect01.custom-select(name="bookTitle", form="transaction")
+      each book in books
+        option(value=book.name)= book.title
+
+  form#transaction(method="POST", action="/transactions/create")
+    button.btn.btn-primary Create
+
+  

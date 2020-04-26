@@ -1,0 +1,58 @@
+extends ../layouts/common
+  
+block content
+  h1 List User
+  a.btn.btn-primary(href="/users/create") Create
+  form(method="GET", action="/users")
+    input(name="q", type='text' value=q)
+    button.btn.btn-primary Search
+    
+  table.table  
+    th Avatar
+    th Name
+    th Update
+    th Delete
+    th Profile
+
+    each item in list
+      tr 
+        td 
+          if item.avatarUrl
+            img(src=item.avatarUrl, width="64")
+          else
+            img(src="/logo.jpg", alt="avatar", width="64")    
+        td= item.name  
+        td
+          a.btn.btn-primary(href="users/update/" + item.id) Update
+        td  
+          a.btn.btn-primary(href="users/delete/" + item.id) Delete
+        td  
+          a.btn.btn-primary(href="profile/" + item.id) Profile
+block footer
+  if currentPage
+    if currentPage > 1
+      nav(aria-label='...')
+        ul.pagination
+          li.page-item
+            a.page-link(href='/users?page='+(currentPage-1)) Previous
+          li.page-item
+            a.page-link(href='/users?page='+(currentPage-1))= currentPage - 1
+          li.page-item.active(aria-current='page')
+            a.page-link(href='/users?page=' + currentPage)= currentPage
+          li.page-item
+            a.page-link(href='/users?page='+(currentPage+1))= currentPage + 1
+          li.page-item
+            a.page-link(href='/users?page='+(currentPage+1)) Next
+    else
+      nav(aria-label='...')
+        ul.pagination
+          li.page-item.disabled
+            a.page-link Previous
+          li.page-item.active
+            a.page-link(href='/users?page='+currentPage)= currentPage
+          li.page-item(aria-current='page')
+            a.page-link(href='/users?page=' + (currentPage+1))= currentPage + 1
+          li.page-item
+            a.page-link(href='/users?page='+(currentPage+2))= currentPage + 2
+          li.page-item
+            a.page-link(href='/users?page='+(currentPage+2)) Next

@@ -1,0 +1,18 @@
+html
+  head
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css', integrity='sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh', crossorigin='anonymous')
+    link(rel="shortcut icon", type="image/png", href="https://cdn.glitch.com/f912dd7b-d6eb-4d31-a282-08caba5e9844%2FlogoCodersx.png?v=1587658550388")
+  body
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      a.navbar-brand(href='#') CodersX
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNavAltMarkup', aria-controls='navbarNavAltMarkup', aria-expanded='false', aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+      #navbarNavAltMarkup.collapse.navbar-collapse
+        .navbar-nav
+          a.nav-item.nav-link.active(href='/users') Users
+          a.nav-item.nav-link(href='/books') Books
+          a.nav-item.nav-link(href='/transactions') Transactions
+    .container
+      block content
+      block footer
+        

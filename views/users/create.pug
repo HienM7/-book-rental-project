@@ -1,0 +1,17 @@
+extends ../layouts/common
+
+block content
+  h1 Create user
+  
+  if(errors)
+    each error in errors
+      .alert.alert-danger= error
+
+  form(method="POST", action="/users/create")
+    .form-group
+      label(for="name")
+      input#name.form-control(name="name", type='text')
+    
+    button.btn.btn-primary Create
+
+  

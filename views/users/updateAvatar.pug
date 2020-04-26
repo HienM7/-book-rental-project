@@ -1,0 +1,18 @@
+extends ../layouts/common
+
+block content
+  h1 Update avatar
+  if user.avatarUrl
+    img(src=user.avatarUrl, width="128")
+  else
+    img(src="/logo.jpg", alt="avatar", width="128")
+  div= "Name: " + user.name
+
+  form(method="POST", action="/profile/avatar", enctype="multipart/form-data")
+    input#id(name="id", type="hidden", value=user.id)
+    .form-group
+      input#avatar.form-control-file(name="avatar", type='file')
+    
+    button.btn.btn-primary Update
+
+    

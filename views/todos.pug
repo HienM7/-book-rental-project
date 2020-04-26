@@ -1,0 +1,13 @@
+html
+  head
+  body
+    form(method="GET", action="/todos")
+      input(name="q", type= 'text' value=q)
+      button Search
+    form(method='POST', action="/todos/create")
+      input(name="todo", type='text')
+      button Create
+      
+    ul
+      each item in list
+        li= item.text 

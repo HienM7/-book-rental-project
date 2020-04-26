@@ -1,0 +1,24 @@
+extends ../layouts/common
+
+block content
+  h1 List Book
+  a.btn.btn-primary(href="/books/create") Create
+  
+  form(method="GET", action="/books")
+    input(name="q", type='text' value=q)
+    button.btn.btn-primary Search
+  table.table
+    th Title
+    th Description
+    th Update
+    th Delete
+
+    each item in list
+      tr 
+        td= item.title
+        td  
+          p= item.description
+        td  
+          a.btn.btn-primary(href="books/update/" + item.id) Update
+        td 
+          a.btn.btn-primary(href="books/delete/" + item.id) Delele

@@ -1,24 +1,34 @@
 const db = require('../db');
 const shortId = require('shortid');
+const User = require('../models/user.model');
+const Book = require('../models/book.model');
+const Transaction = require('../models/transaction.model');
 
-module.exports.getTransactions = (req, res) => {
+module.exports.getTransactions = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   const startPage = res.locals.startPage;
   const endPage = res.locals.endPage;
-  let transactionList = db.get('transactions').value();
-    
-  transactionList = transactionList.map(item => {
-    const userId = item.userId;
-    const bookId = item.bookId;
-    return {
-      id: item.id,
-      user: db.get("users").find({id: userId}).value().name,
-      book: db.get("books").find({id: bookId}).value().title,
+  let transactionList = await Transaction.find();
+
+  for(let i = 0; i < transactionList.length; ++i) {
+    const userId =  transactionList[i].userId;
+    const bookId =  transactionList[i].bookId;
+    const id =  transactionList[i].id;
+    const isComplete =  transactionList[i].isComplete;
+
+    let bookTitle = await Book.findOne({id: bookId});
+    let userName = await User.findOne({id: userId});
+    bookTitle = bookTitle.title;
+    userName = userName.name;
+    transactionList[i] = {
+      id: id,
+      user: userName,
+      book: bookTitle,
       userId: userId,
       bookId: bookId,
-      isComplete: item.isComplete
+      isComplete: isComplete
     };
-  });
+  }
 
   if(!isAdmin) {
     transactionList = transactionList.filter(item => 
@@ -35,55 +45,54 @@ module.exports.getTransactions = (req, res) => {
   });
 };
 
-module.exports.postCreateTransaction = (req, res) => {
+module.exports.postCreateTransaction = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
     return;
   }
+  const user = await User.findOne({name: req.body.username});
+  const book = await Book.findOne({title: req.body.bookTitle});
   const transaction = {
     id: shortId.generate(),
-    userId: db.get("users")
-      .find({name: req.body.username})
-      .value().id,
-    bookId: db.get("books")
-      .find({title: req.body.bookTitle})
-      .value().id,
+    userId: user.id,
+    bookId: book.id,
     isComplete: false
   };
-  db.get('transactions').push(transaction).write();
+  await Transaction.create(transaction);
   res.redirect('/transactions');
 };
 
-module.exports.getCreateTransaction = (req, res) => {
+module.exports.getCreateTransaction = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
     return;
   }
+  const users = await User.find();
+  const books = await Book.find();
+
   res.render('./transactions/create', {
-    users: db.get("users").value(),
-    books: db.get("books").value(),
+    users: users,
+    books: books,
   });
 
 };
 
-module.exports.getComplete = (req, res) => {
+module.exports.getComplete = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
     return;
   }
   const id = req.params.id;
-  const matchTransaction = db.get("transactions").find({id: id}).value();
+  const matchTransaction = await Transaction.findOne({id: id});
   if(!matchTransaction) {
     res.send("Id transaction not exist");
     return;
   }
-  db.get("transactions")
-    .find({id: id})
-    .assign({isComplete: true})
-    .write();
+
+  await Transaction.updateOne({id: id}, {isComplete: true});
     res.redirect('back');
 };
 

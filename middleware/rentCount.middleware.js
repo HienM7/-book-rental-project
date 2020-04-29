@@ -1,10 +1,9 @@
 const db = require('../db');
+const Session = require('../models/session.model');
 
-module.exports =  (req, res, next) => {
+module.exports = async (req, res, next) => {
     if(req.signedCookies.sessionId) {
-        const session = db.get("sessions")
-          .find({id: req.signedCookies.sessionId})
-          .value();
+        const session = await Session.findOne({id: req.signedCookies.sessionId});
         let rent = session.rent;
         let count = 0;        
         for (let key in rent) {

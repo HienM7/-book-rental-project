@@ -1,9 +1,11 @@
 const db = require('../db');
+const User = require('../models/user.model');
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   let isAdmin = false;
   if (req.signedCookies.userId) {
-    isAdmin = db.get("users").find({id: req.signedCookies.userId}).value().isAdmin;
+    const user = await User.findOne({id: req.signedCookies.userId});
+    isAdmin = user.isAdmin;
   }
   res.locals.isAdmin = isAdmin;
   next();

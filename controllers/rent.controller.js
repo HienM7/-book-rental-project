@@ -1,45 +1,49 @@
 const db = require('../db');
+const Session = require('../models/session.model');
+const Book = require('../models/book.model');
+const Transaction = require('../models/transaction.model');
+
 const shortid = require('shortid');
 
-module.exports.addToRent = function(req, res) {
+module.exports.addToRent = async function(req, res) {
     const bookId = req.params.id;
     const sessionId = req.signedCookies.sessionId;
     if(!sessionId) {
       res.redirect('/books');
     }
+    let sessionFind = await Session.find({id: sessionId })
+    let count = sessionFind[0]["rent"][bookId] || 0;
 
-    db.get('sessions')
-      .find({id: sessionId})
-      .update("rent."+ bookId, n => {
-        if(!n) return 1;
-        return n + 1;
-      })
-      .write();
+    await Session.updateOne({id: sessionId},{["rent."+ bookId]: count + 1});
     
     res.redirect('/books');
 
 }
 
-module.exports.listRent = function(req, res) {
-  const sessionId = req.signedCookies.sessionId;
+module.exports.listRent = async function(req, res) {
+  let sessionId = req.signedCookies.sessionId;
   if(!sessionId) {
     res.redirect('/books');
+    return;
   }
 
-  const rent = db.get("sessions")
-    .find({id: sessionId})
-    .value().rent;
+  let session = await Session.findOne({id: sessionId});
+  if(!session) {
+    res.redirect('/books');
+    return;
+  }
+  let rent = session.rent;
 
-  const listRent = db.get("books")
-    .value()
-    .filter(book => book.id in rent);
-  
+  let listRent = await Book.find();
+
+  listRent = listRent.filter(book => book.id in rent);
+ 
   res.render('./books/rent', {
     list: listRent
   });
 }
 
-module.exports.submitRent = function(req, res) {
+module.exports.submitRent = async function(req, res) {
   const sessionId = req.signedCookies.sessionId;
   const userId = req.signedCookies.userId;
   if(!sessionId) {
@@ -50,24 +54,21 @@ module.exports.submitRent = function(req, res) {
     res.redirect('/auth/login')
   }
 
-  const rent = db.get("sessions")
-    .find({id: sessionId})
-    .value().rent;
+  let session = await Session.findOne({id: sessionId});
+  if(!session) {
+    res.redirect('/books');
+    return;
+  }
+  rent = session.rent;
 
   for(const key in rent) {
-    db.get("transactions")
-      .push({
-        id: shortid.generate(),
-        userId: userId,
-        bookId: key
-      })
-      .write();
+    await Transaction.create({
+      id: shortid.generate(),
+      userId: userId,
+      bookId: key
+    })
   }
-
-  db.get("sessions")
-    .find({id: sessionId})
-    .assign({rent: {}})
-    .write();
+  await Session.updateOne({id: sessionId}, {rent: {}});
 
   res.redirect("/transactions");
 

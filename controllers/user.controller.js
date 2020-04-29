@@ -1,7 +1,8 @@
 const shortid = require('shortid');
 const db = require('../db');
+const User = require('../models/user.model');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
@@ -10,25 +11,25 @@ module.exports.getUsers = (req, res) => {
   let q = req.query.q || "";
   const startPage = res.locals.startPage;
   const endPage = res.locals.endPage;
-  const matchedList = db.get('users').value().filter(item => item.name.toLowerCase().indexOf(q.toLowerCase()) !== -1);
+  let matchedList = await User.find();
+  matchedList = matchedList.filter(item => item.name.toLowerCase().indexOf(q.toLowerCase()) !== -1);
   res.render('./users/users', {
     list: matchedList.slice(startPage, endPage),
     q: q
   });
 };
 
-module.exports.postCreateUser = (req, res) => {
+module.exports.postCreateUser = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
     return;
   }
-  db.get('users')
-    .push({
-      name: req.body.name,
-      id: shortid.generate()
-    })
-    .write();
+  
+  await User.create({
+    name: req.body.name,
+    id: shortid.generate()
+  })
   
     res.redirect('/users');
 };
@@ -42,20 +43,20 @@ module.exports.getCreateUser = (req, res) => {
   res.render('./users/create');
 };
 
-module.exports.getUpdateUser = (req, res) => {
+module.exports.getUpdateUser = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
     return;
   }
   const id = req.params.id;
-  const user = db.get('users').find({id: id}).value();
+  const user = await User.findOne({id: id});
   res.render('./users/update', {
     user: user
   });
 };
 
-module.exports.postUpdateUser = (req, res) => {
+module.exports.postUpdateUser = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
@@ -65,22 +66,17 @@ module.exports.postUpdateUser = (req, res) => {
   const userUpdated = {
     name: req.body.name
   };
-  db.get('users')
-    .find({ id: id })
-    .assign(userUpdated)
-    .write();
+  await User.updateOne({ id: id }, userUpdated);
   res.redirect('/users');
 };
 
-module.exports.deleteUser = (req, res) => {
+module.exports.deleteUser = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
     return;
   }
   const id = req.params.id;
-  db.get('users')
-    .remove({id: id})
-    .write();
+  await User.deleteOne({id: id});
   res.redirect('back');
 };

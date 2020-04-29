@@ -1,4 +1,7 @@
 const db = require('../db');
+
+const User = require('../models/user.model');
+
 const bcrypt = require('bcrypt');
 const sgMail = require('@sendgrid/mail');
 
@@ -18,7 +21,7 @@ module.exports.login = (req, res) => {
 module.exports.postLogin = async (req, res) => {
   const email = req.body.email;
   const pass = req.body.pass;
-  const user = db.get('users').find({email: email}).value();
+  const user = await User.findOne({email: email});
 
   if(!user) {
       res.render("auth/login", {
@@ -38,10 +41,7 @@ module.exports.postLogin = async (req, res) => {
       }).catch((error) => {
         console.log(error.response.body);
       })
-      db.get('users')
-      .find({email: email})
-      .assign({sentEmail: true})
-      .write();
+      await User.updateOne({email: email}, {sentEmail: true})
     }
     res.render('auth/login', {
       errors: [
@@ -54,12 +54,9 @@ module.exports.postLogin = async (req, res) => {
   
   const match = await bcrypt.compare(pass, user.pass);
   if(!match) {
-    db.get('users')
-      .find({email: email})
-      .update('wrongLoginCount', n => n + 1)
-      .write();
-    
-      res.render('auth/login', {
+    await User.updateOne({email: email},{ $inc: {wrongLoginCount: 1}});
+
+    res.render('auth/login', {
         errors: [
             "Password is incorrect"
         ],

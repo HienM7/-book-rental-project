@@ -1,4 +1,5 @@
 const shortid = require('shortid');
+const Book = require('../models/book.model');
 const db = require('../db');
 
 const cloudinary = require('cloudinary').v2;
@@ -9,11 +10,12 @@ cloudinary.config({
   api_secret: 'mIHwse6VWTOP_3emi3BPrYV7wBw' 
 });
 
-module.exports.getBooks = (req, res) => {
+module.exports.getBooks = async (req, res) => {
   let q="";
   const isAdmin = res.locals.isAdmin;
   if(req.query.q) q = req.query.q;   
-  const matchedList = db.get('books').value().filter(item => item.title.toLowerCase().indexOf(q.toLowerCase()) !== -1);
+  let matchedList = await Book.find()
+  matchedList = matchedList.filter(item => item.title.toLowerCase().indexOf(q.toLowerCase()) !== -1);
   
   if(isAdmin) {
     res.render('./books/books', {
@@ -42,9 +44,10 @@ module.exports.postCreateBook = async (req, res) => {
     book.coverUrl = response.url;
   } catch(error) {
     console.log(error);
+    return;
   }
 
-  db.get('books').push(book).write();
+  Book.create(book);
   res.redirect('/books');
 };
 
@@ -52,11 +55,11 @@ module.exports.getCreateBook = (req, res) => {
   res.render('./books/create');
 };
 
-module.exports.getUpdateBook = (req, res) => {
+module.exports.getUpdateBook = async (req, res) => {
   const id = req.params.id;
-  const book = db.get('books').find({id: id}).value();
+  const book = await Book.find({id: id});
   res.render('./books/update', {
-    book: book
+    book: book[0]
   });
 };
 
@@ -75,17 +78,12 @@ module.exports.postUpdateBook = async (req, res) => {
   } catch(error) {
     console.log(error);
   }
-  db.get('books')
-    .find({ id: id })
-    .assign(bookUpdated)
-    .write();
+  await Book.updateOne({ id: id }, bookUpdated);
   res.redirect('back');
 };
 
-module.exports.deleteBook = (req, res) => {
+module.exports.deleteBook = async (req, res) => {
   const id = req.params.id;
-  db.get('books')
-    .remove({id: id})
-    .write();
+  await Book.deleteOne({id: id})
   res.redirect('back');
 };

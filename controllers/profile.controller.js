@@ -1,4 +1,6 @@
 const db = require('../db');
+const User = require('../models/user.model');
+
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({ 
@@ -8,20 +10,20 @@ cloudinary.config({
 });
 
 
-module.exports.getUpdateUser = (req, res) => {
+module.exports.getUpdateUser = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
     return;
   }
   const id = req.params.id;
-  const user = db.get('users').find({id: id}).value();
+  const user = await User.find({id: id});
   res.render('./users/profile', {
-    user: user
+    user: user[0]
   });
 };
 
-module.exports.postUpdateUser = (req, res) => {
+module.exports.postUpdateUser = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
@@ -31,24 +33,21 @@ module.exports.postUpdateUser = (req, res) => {
   const userUpdated = {
     name: req.body.name
   };
-  db.get('users')
-    .find({ id: id })
-    .assign(userUpdated)
-    .write();
+  await User.updateOne({ id: id }, userUpdated)
   res.redirect('/users');
 };
 
 
-module.exports.getUpdateAvatar = (req, res) => {
+module.exports.getUpdateAvatar = async (req, res) => {
   const isAdmin = res.locals.isAdmin;
   if(!isAdmin) {
     res.redirect('back');
     return;
   }
   const id = req.params.id;
-  const user = db.get('users').find({id: id}).value();
+  const user = await User.find({id: id});
   res.render('./users/updateAvatar', {
-    user: user
+    user: user[0]
   });
 };
 
@@ -70,9 +69,6 @@ module.exports.postUpdateAvatar = async (req, res) => {
     console.log(error);
   }
   console.log("////////////////////////");
-  db.get('users')
-    .find({ id: id })
-    .assign(userUpdated)
-    .write();
+  await User.updateOne({ id: id }, userUpdated)
   res.redirect('back');
 };

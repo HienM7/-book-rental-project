@@ -2,7 +2,6 @@ extends ../layouts/common
 
 block content
   h1 List Book
-  a.btn.btn-primary(href="/books/create") Create
   
   form(method="GET", action="/books")
     input(name="q", type='text' value=q)
@@ -11,11 +10,9 @@ block content
     th Cover
     th Title
     th Description
-    th Update
-    th Delete
 
     each item in list
-      tr
+      tr 
         td
           if item.coverUrl
             img(src=item.coverUrl, alt="", width="64")
@@ -24,7 +21,5 @@ block content
         td= item.title
         td  
           p= item.description
-        td  
-          a.btn.btn-primary(href="books/update/" + item.id) Update
-        td 
-          a.btn.btn-primary(href="books/delete/" + item.id) Delele
+        td
+          a.btn.btn-primary(href="/rent/add/" + item.id) Add to rent

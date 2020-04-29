@@ -4,14 +4,14 @@ const db = require('../db');
 module.exports = (req, res, next) => {
   
   if(!req.signedCookies.sessionId) {
-    const sessionId = shortid.generate();
-    res.cookie("sessionId", sessionId, {
+    const id = shortid.generate();
+    res.cookie("sessionId", id, {
       signed: true
     });  
     db.get("sessions")
       .push({
-        sessionId: sessionId,
-        count: 0
+        id: id,
+        rent: {}
       })
       .write();
   } 

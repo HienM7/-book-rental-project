@@ -2,15 +2,20 @@ extends ../layouts/common
 
 block content
   h1 Update book
-  form(method="POST", action="/books/update")
+  if book.coverUrl
+    img(src=book.coverUrl, alt="", width="128")
+  else
+    img(src="/book.png", alt="", width="128")
+  form(method="POST", action="/books/update", enctype="multipart/form-data")
     input#id(name="id", type="hidden", value=book.id)
     .form-group  
-      label(for="title")
+      label(for="title") Title
       input#title.form-control(name="title", type='text', value=book.title)
     .form-group
-      label(for="des")
+      label(for="des") 
       input#des.form-control(name="description", type='text', value=book.description)
-    
+    .form-group Change book cover
+      input#avatar.form-control-file(name="avatar", type='file')
     button.btn.btn-primary Update
 
   

@@ -9,6 +9,11 @@ cloudinary.config({
 
 
 module.exports.getUpdateUser = (req, res) => {
+  const isAdmin = res.locals.isAdmin;
+  if(!isAdmin) {
+    res.redirect('back');
+    return;
+  }
   const id = req.params.id;
   const user = db.get('users').find({id: id}).value();
   res.render('./users/profile', {
@@ -17,6 +22,11 @@ module.exports.getUpdateUser = (req, res) => {
 };
 
 module.exports.postUpdateUser = (req, res) => {
+  const isAdmin = res.locals.isAdmin;
+  if(!isAdmin) {
+    res.redirect('back');
+    return;
+  }
   const id = req.body.id;
   const userUpdated = {
     name: req.body.name
@@ -30,6 +40,11 @@ module.exports.postUpdateUser = (req, res) => {
 
 
 module.exports.getUpdateAvatar = (req, res) => {
+  const isAdmin = res.locals.isAdmin;
+  if(!isAdmin) {
+    res.redirect('back');
+    return;
+  }
   const id = req.params.id;
   const user = db.get('users').find({id: id}).value();
   res.render('./users/updateAvatar', {
@@ -38,6 +53,11 @@ module.exports.getUpdateAvatar = (req, res) => {
 };
 
 module.exports.postUpdateAvatar = async (req, res) => {
+  const isAdmin = res.locals.isAdmin;
+  if(!isAdmin) {
+    res.redirect('back');
+    return;
+  }
   const id = req.body.id;
   const userUpdated = {
     path: req.file.path

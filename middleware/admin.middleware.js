@@ -1,10 +1,10 @@
 const db = require('../db');
 
 module.exports = (req, res, next) => {
-  const isAdmin = db.get("users").find({id: req.signedCookies.userId}).value().isAdmin;
-  if(!isAdmin) {
-    res.redirect('back');
-    return;
+  let isAdmin = false;
+  if (req.signedCookies.userId) {
+    isAdmin = db.get("users").find({id: req.signedCookies.userId}).value().isAdmin;
   }
+  res.locals.isAdmin = isAdmin;
   next();
 }

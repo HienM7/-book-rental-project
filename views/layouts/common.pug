@@ -12,6 +12,7 @@ html
           a.nav-item.nav-link.active(href='/users') Users
           a.nav-item.nav-link(href='/books') Books
           a.nav-item.nav-link(href='/transactions') Transactions
+          a.nav-item.nav-link(href="/rent")= rentCount ? "Rent("+ rentCount +")" : "Rent"
     .container
       block content
       block footer

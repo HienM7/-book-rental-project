@@ -1,0 +1,44 @@
+extends ../layouts/common
+  
+block content
+  h1 Transactions
+  table.table
+    tr
+      th User name
+      th Book title
+      th Status
+      
+      each transaction in transactionList
+        tr
+          td= transaction.user
+          td= transaction.book
+          td= transaction.isComplete ? "Completed" : "Incomplete"
+          
+block footer
+  if currentPage
+    if currentPage > 1
+      nav(aria-label='...')
+        ul.pagination
+          li.page-item
+            a.page-link(href='/transactions?page='+(currentPage-1)) Previous
+          li.page-item
+            a.page-link(href='/transactions?page='+(currentPage-1))= currentPage - 1
+          li.page-item.active(aria-current='page')
+            a.page-link(href='/transactions?page=' + currentPage)= currentPage
+          li.page-item
+            a.page-link(href='/transactions?page='+(currentPage+1))= currentPage + 1
+          li.page-item
+            a.page-link(href='/transactions?page='+(currentPage+1)) Next
+    else
+      nav(aria-label='...')
+        ul.pagination
+          li.page-item.disabled
+            a.page-link Previous
+          li.page-item.active
+            a.page-link(href='/transactions?page='+currentPage)= currentPage
+          li.page-item(aria-current='page')
+            a.page-link(href='/transactions?page=' + (currentPage+1))= currentPage + 1
+          li.page-item
+            a.page-link(href='/transactions?page='+(currentPage+2))= currentPage + 2
+          li.page-item
+            a.page-link(href='/transactions?page='+(currentPage+2)) Next

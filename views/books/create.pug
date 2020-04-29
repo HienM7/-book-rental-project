@@ -4,13 +4,13 @@ block content
   h1 Add book
   br
   br
-  form(method="POST", action="/books/create")
+  form(method="POST", action="/books/create", enctype="multipart/form-data")
     .form-group
       label(for="title") Title
       input#title.form-control(name="title", type='text')
     .form-group
       label(for="des") Description
       input#des.form-control(name="description", type='text')
+    .form-group
+      input#avatar.form-control-file(name="avatar", type='file')
     button.btn.btn-primary Create
-
-    

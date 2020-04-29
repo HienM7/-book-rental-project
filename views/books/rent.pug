@@ -1,0 +1,17 @@
+extends ../layouts/common
+
+block content
+  h1 List Book
+  table.table
+    th Cover
+    th Title
+    th Description
+
+    each item in list
+      tr 
+        td
+          img(src="/", alt="")
+        td= item.title
+        td  
+          p= item.description
+  a.btn.btn-primary(href="/rent/submit") Submit

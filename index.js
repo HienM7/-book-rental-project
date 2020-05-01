@@ -29,7 +29,7 @@ const authMiddleware = require('./middleware/auth.middleware');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser("SECRET_KEY"));
+app.use(cookieParser(process.env.SECRET_KEY));
 app.use(express.static('public'))
 app.set('views', './views');
 app.set('view engine', 'pug');

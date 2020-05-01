@@ -24,12 +24,6 @@ module.exports.getBooks = async (req, res, next) => {
     });
     return;
   }
-  try {
-  var a; 
-  a.b();
-  } catch (error) {
-    res.render('./errors/error500');
-  }
   res.render('./books/library', {
     list: matchedList,
     q: q

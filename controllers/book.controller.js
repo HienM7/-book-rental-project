@@ -10,7 +10,7 @@ cloudinary.config({
   api_secret: 'mIHwse6VWTOP_3emi3BPrYV7wBw' 
 });
 
-module.exports.getBooks = async (req, res) => {
+module.exports.getBooks = async (req, res, next) => {
   let q="";
   const isAdmin = res.locals.isAdmin;
   if(req.query.q) q = req.query.q;   
@@ -23,6 +23,12 @@ module.exports.getBooks = async (req, res) => {
       q: q
     });
     return;
+  }
+  try {
+  var a; 
+  a.b();
+  } catch (error) {
+    res.render('./errors/error500');
   }
   res.render('./books/library', {
     list: matchedList,
@@ -47,7 +53,7 @@ module.exports.postCreateBook = async (req, res) => {
     return;
   }
 
-  Book.create(book);
+  await Book.create(book);
   res.redirect('/books');
 };
 
@@ -55,7 +61,7 @@ module.exports.getCreateBook = (req, res) => {
   res.render('./books/create');
 };
 
-module.exports.getUpdateBook = async (req, res) => {
+module.exports.getUpdateBook = async (req, res, next) => {
   const id = req.params.id;
   const book = await Book.find({id: id});
   res.render('./books/update', {
